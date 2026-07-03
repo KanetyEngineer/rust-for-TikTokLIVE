@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust × TikTokLIVE Integration</title>
+    <style>
+        /* --- クリーンで洗練されたダークテーマのCSS --- */
+        :root {
+            --bg-color: #0f111a;
+            --card-bg: #161925;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent-color: #6366f1;
+            /* 鮮やかなパープル・ブルー */
+            --accent-hover: #4f46e5;
+            --success-color: #10b981;
+            --border-color: #2d3142;
+            --input-bg: #1f2335;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: block;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ヘッダーデザイン */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, #ff0050, #00f2fe, var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* 通知アラート */
+        .alert {
+            display: none;
+            background-color: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--success-color);
+            color: #34d399;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* メインカード */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        /* フォーム要素 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-of-type {
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 14px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        input::placeholder {
+            color: #4b5563;
+        }
+
+        /* ボタン */
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* フッター・ステータス */
+        .status-bar {
+            margin-top: 20px;
+            display: block;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        /* デバッグパネル用デザイン */
+        .debug-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-debug {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-debug:hover {
+            border-color: var(--accent-color);
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+
+        #testAlert {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        /* デバッグパネル用デザイン */
+        .debug-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-debug {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-debug:hover {
+            border-color: var(--accent-color);
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+
+        #testAlert {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Rust × TikTokLIVE Controller</h1>
+            <p>ストリーマー用環境設定パネル</p>
+        </header>
+
+        <div class="alert" id="saveAlert">
+            ✓ 設定が正常に保存され、システムに適用されました。
+        </div>
+
+        <div class="card">
+            <form action="/api/config" method="POST">
+
+                <div class="section-title">配信アカウント連携</div>
+
+                <div class="form-group">
+                    <label for="tiktokId">TikTok ユーザーID</label>
+                    <input type="text" name="tiktokId" id="tiktokId" placeholder="@username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="steamId">プレイヤー Steam ID (64bit)</label>
+                    <input type="text" name="steamId" id="steamId" placeholder="7656119xxxxxxxxxx" required>
+                </div>
+
+                <div class="section-title">中央APIサーバー接続設定</div>
+
+                <div class="form-group">
+                    <label for="apiUrl">中継APIサーバー URL</label>
+                    <input type="text" name="apiUrl" id="apiUrl" placeholder="http://ホストIP:5000/api/event" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="apiToken">セキュリティ認証トークン</label>
+                    <input type="password" name="apiToken" id="apiToken" placeholder="SECRET_ACCESS_TOKEN" required>
+                </div>
+
+                <button type="submit">設定を保存して接続</button>
+            </form>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <div class="section-title">テスト・デバッグ実行</div>
+            <p style="font-size: 12px; color: var(--text-muted);">
+                配信外でもRustサーバーへ直接イベントを送信し、動作確認ができます。（※先に上の設定を保存してください）
+            </p>
+
+            <div class="debug-grid">
+                <button type="button" class="btn-debug" onclick="sendTest('follow_reward')">🎁 フォロー (資材)</button>
+                <button type="button" class="btn-debug" onclick="sendTest('reduce_food')">🌹 バラ (食料-1)</button>
+                <button type="button" class="btn-debug" onclick="sendTest('spawn_bear')">🐻 ハートミー (クマ)</button>
+            </div>
+
+            <div id="testAlert"></div>
+        </div>
+        <div class="card" style="margin-top: 20px;">
+            <div class="section-title">テスト・デバッグ実行</div>
+            <p style="font-size: 12px; color: var(--text-muted);">
+                配信外でもRustサーバーへ直接イベントを送信し、動作確認ができます。（※先に上の設定を保存してください）
+            </p>
+
+            <div class="debug-grid">
+                <button type="button" class="btn-debug" onclick="sendTest('follow_reward')">🎁 フォロー (資材)</button>
+                <button type="button" class="btn-debug" onclick="sendTest('reduce_food')">🌹 バラ (食料-1)</button>
+                <button type="button" class="btn-debug" onclick="sendTest('spawn_bear')">🐻 ハートミー (クマ)</button>
+            </div>
+
+            <div id="testAlert"></div>
+        </div>
+
+        <div class="status-bar">
+            <span class="status-dot"></span> Local Web UI Webcast running on localhost:3000
+        </div>
+    </div>
+
+    <script>
+        // URLパラメータの確認 (?saved=true があればアラートを表示)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('saved') === 'true') {
+            const alertBox = document.getElementById('saveAlert');
+            alertBox.style.display = 'block';
+            // 5秒後に自動で消す
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+                // URLからクエリパラメータを消去して綺麗にする
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }, 5000);
+        }
+
+        // 起動時に現在の設定ファイルをAPI経由で取得し、フォームに自動挿入
+        fetch('/api/config')
+            .then(res => res.json())
+            .then(data => {
+                if (data.tiktokId) document.getElementById('tiktokId').value = data.tiktokId;
+                if (data.steamId) document.getElementById('steamId').value = data.steamId;
+                if (data.apiUrl) document.getElementById('apiUrl').value = data.apiUrl;
+                if (data.apiToken) document.getElementById('apiToken').value = data.apiToken;
+            })
+            .catch(err => console.error('設定データの取得に失敗しました:', err));
+        // 【新規追加】テストイベント送信用スクリプト
+        async function sendTest(eventType) {
+            const alertBox = document.getElementById('testAlert');
+            alertBox.style.display = 'block';
+            alertBox.style.backgroundColor = 'rgba(255,255,255,0.1)';
+            alertBox.style.color = '#fff';
+            alertBox.innerText = '送信中...';
+
+            try {
+                const res = await fetch('/api/test-event', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ eventType })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alertBox.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+                    alertBox.style.color = '#34d399';
+                    alertBox.style.border = '1px solid #10b981';
+                    alertBox.innerText = '✓ イベントの送信に成功しました！';
+                } else {
+                    throw new Error(data.error || '不明なエラー');
+                }
+            } catch (err) {
+                alertBox.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                alertBox.style.color = '#f87171';
+                alertBox.style.border = '1px solid #ef4444';
+                alertBox.innerText = '❌ エラー: ' + err.message;
+            }
+
+            // 3秒後に通知を消す
+            setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
+        }
+        // 【新規追加】テストイベント送信用スクリプト
+        async function sendTest(eventType) {
+            const alertBox = document.getElementById('testAlert');
+            alertBox.style.display = 'block';
+            alertBox.style.backgroundColor = 'rgba(255,255,255,0.1)';
+            alertBox.style.color = '#fff';
+            alertBox.innerText = '送信中...';
+
+            try {
+                const res = await fetch('/api/test-event', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ eventType })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alertBox.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+                    alertBox.style.color = '#34d399';
+                    alertBox.style.border = '1px solid #10b981';
+                    alertBox.innerText = '✓ イベントの送信に成功しました！';
+                } else {
+                    throw new Error(data.error || '不明なエラー');
+                }
+            } catch (err) {
+                alertBox.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                alertBox.style.color = '#f87171';
+                alertBox.style.border = '1px solid #ef4444';
+                alertBox.innerText = '❌ エラー: ' + err.message;
+            }
+
+            // 3秒後に通知を消す
+            setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
+        }
+
+    </script>
+</body>
+
+</html>

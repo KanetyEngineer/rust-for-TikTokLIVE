@@ -1,0 +1,6 @@
+{
+    "tiktokId": "streamer_tiktok_id",
+    "steamId": "streamer_steam_id",
+    "apiUrl": "http://中央サーバーのIP:5000/api/event",
+    "apiToken": "SECRET_ACCESS_TOKEN_12345"
+}
