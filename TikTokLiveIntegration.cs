@@ -65,9 +65,9 @@ namespace Oxide.Plugins
             if (arg.Args == null || arg.Args.Length < 2) return;
 
             ulong steamId;
-            if (!ulong.TryParse(arg.Args[0], out steamId)) return;
-
-            string eventType = arg.Args[1];
+            if (!ulong.TryParse(arg.Args[0].ToString(), out steamId)) return;
+            
+            string eventType = arg.Args[1].ToString();
             BasePlayer targetPlayer = BasePlayer.FindByID(steamId);
 
             if (targetPlayer == null || !targetPlayer.IsConnected) return;
