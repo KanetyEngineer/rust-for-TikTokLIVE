@@ -78,40 +78,131 @@
             color: var(--text-color);
         }
 
-        /* 現在の設定（読み取り専用） */
-        .config-row {
+        /* フォーム要素 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 14px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        input::placeholder {
+            color: #4b5563;
+        }
+
+        /* ボタン */
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #configAlert {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        /* ギフト→アクション マッピング設定 */
+        .mapping-row {
             display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
+            gap: 8px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .mapping-row input[type="text"] {
+            flex: 1;
+        }
+
+        .mapping-row select {
+            flex: 1;
+            padding: 12px 10px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
             font-size: 14px;
         }
 
-        .config-row:last-child {
-            border-bottom: none;
+        .btn-remove {
+            width: auto;
+            padding: 10px 14px;
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: #f87171;
+            border-radius: 8px;
+            cursor: pointer;
         }
 
-        .config-row .key {
+        .btn-remove:hover {
+            border-color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px dashed var(--border-color);
             color: var(--text-muted);
+            margin-top: 4px;
         }
 
-        .config-row .value {
-            font-family: Consolas, monospace;
-            word-break: break-all;
-            text-align: right;
+        .btn-secondary:hover {
+            border-color: var(--accent-color);
+            color: var(--text-color);
+            background-color: rgba(99, 102, 241, 0.1);
         }
 
-        .hint {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 14px;
-        }
-
-        .hint code {
-            background-color: var(--input-bg);
-            padding: 1px 6px;
-            border-radius: 4px;
+        #mappingAlert {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: center;
         }
 
         /* デバッグパネル用デザイン */
@@ -172,38 +263,58 @@
     <div class="container">
         <header>
             <h1>Rust × TikTokLIVE Controller</h1>
-            <p>デバッグ・動作確認パネル</p>
+            <p>ストリーマー用環境設定・デバッグパネル</p>
         </header>
 
         <div class="card">
-            <div class="section-title">現在の設定（読み取り専用）</div>
-            <div class="config-row">
-                <span class="key">tiktokId</span>
-                <span class="value" id="cfgTiktokId">-</span>
+            <div class="section-title">環境設定</div>
+
+            <div class="form-group">
+                <label for="tiktokId">TikTok ユーザーID</label>
+                <input type="text" id="tiktokId" placeholder="@username">
             </div>
-            <div class="config-row">
-                <span class="key">steamId</span>
-                <span class="value" id="cfgSteamId">-</span>
+
+            <div class="form-group">
+                <label for="steamId">プレイヤー Steam ID (64bit)</label>
+                <input type="text" id="steamId" placeholder="7656119xxxxxxxxxx">
             </div>
-            <div class="config-row">
-                <span class="key">apiUrl</span>
-                <span class="value" id="cfgApiUrl">-</span>
+
+            <div class="form-group">
+                <label for="apiUrl">中継APIサーバー URL</label>
+                <input type="text" id="apiUrl" placeholder="http://ホストIP:5000/api/event">
             </div>
-            <p class="hint">設定を変更する場合は、このツールのフォルダにある <code>config.json</code> を直接編集し、
-                <code>start.bat</code> を再起動してください。</p>
+
+            <div class="form-group">
+                <label for="apiToken">セキュリティ認証トークン</label>
+                <input type="password" id="apiToken" placeholder="SECRET_ACCESS_TOKEN">
+            </div>
+
+            <button type="button" onclick="saveConfig()">設定を保存して接続</button>
+
+            <div id="configAlert"></div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <div class="section-title">ギフト → アクション設定</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">
+                任意のギフト名に、任意のアクションを割り当てられます。ここでの変更はツールを再起動しなくても次のギフトから反映されます。
+            </p>
+
+            <div id="mappingList"></div>
+
+            <button type="button" class="btn-secondary" onclick="addMappingRow()">+ 行を追加</button>
+            <button type="button" style="margin-top: 10px;" onclick="saveMappings()">保存</button>
+
+            <div id="mappingAlert"></div>
         </div>
 
         <div class="card" style="margin-top: 20px;">
             <div class="section-title">テスト・デバッグ実行</div>
             <p style="font-size: 12px; color: var(--text-muted);">
-                配信外でもRustサーバーへ直接イベントを送信し、動作確認ができます。（※先に config.json の設定を済ませてください）
+                配信外でもRustサーバーへ直接イベントを送信し、動作確認ができます。（※先に上の環境設定を保存してください）
             </p>
 
-            <div class="debug-grid">
-                <button type="button" class="btn-debug" onclick="sendTest('follow_reward')">🎁 フォロー (資材)</button>
-                <button type="button" class="btn-debug" onclick="sendTest('reduce_food')">🌹 バラ (食料-1)</button>
-                <button type="button" class="btn-debug" onclick="sendTest('spawn_bear')">🐻 ハートミー (クマ)</button>
-            </div>
+            <div class="debug-grid" id="debugGrid"></div>
 
             <div id="testAlert"></div>
         </div>
@@ -214,15 +325,178 @@
     </div>
 
     <script>
-        // 起動時に現在の設定ファイルをAPI経由で取得し、読み取り専用欄に表示
-        fetch('/api/config')
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('cfgTiktokId').textContent = data.tiktokId || '(未設定)';
-                document.getElementById('cfgSteamId').textContent = data.steamId || '(未設定)';
-                document.getElementById('cfgApiUrl').textContent = data.apiUrl || '(未設定)';
-            })
-            .catch(err => console.error('設定データの取得に失敗しました:', err));
+        // 起動時に現在の設定ファイルをAPI経由で取得し、フォームに反映
+        async function loadConfig() {
+            const res = await fetch('/api/config');
+            const data = await res.json();
+            document.getElementById('tiktokId').value = data.tiktokId || '';
+            document.getElementById('steamId').value = data.steamId || '';
+            document.getElementById('apiUrl').value = data.apiUrl || '';
+            document.getElementById('apiToken').value = data.apiToken || '';
+        }
+        loadConfig().catch(err => console.error('設定データの取得に失敗しました:', err));
+
+        // 環境設定の保存
+        async function saveConfig() {
+            const alertBox = document.getElementById('configAlert');
+            alertBox.style.display = 'block';
+            alertBox.style.backgroundColor = 'rgba(255,255,255,0.1)';
+            alertBox.style.color = '#fff';
+            alertBox.innerText = '保存中...';
+
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tiktokId: document.getElementById('tiktokId').value,
+                        steamId: document.getElementById('steamId').value,
+                        apiUrl: document.getElementById('apiUrl').value,
+                        apiToken: document.getElementById('apiToken').value
+                    })
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || '保存に失敗しました');
+
+                alertBox.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+                alertBox.style.color = '#34d399';
+                alertBox.style.border = '1px solid #10b981';
+                alertBox.innerText = '✓ 設定を保存しました。TikTok LIVEへの接続を再開しています。';
+            } catch (err) {
+                alertBox.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                alertBox.style.color = '#f87171';
+                alertBox.style.border = '1px solid #ef4444';
+                alertBox.innerText = '❌ エラー: ' + err.message;
+            }
+
+            setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
+        }
+
+        // ギフト → アクション マッピング編集用スクリプト
+        const EVENT_LABELS = {
+            // 妨害系
+            reduce_food: '🌹 食料減少',
+            reduce_water: '💧 水分減少',
+            damage_player: '💥 ダメージ',
+            spawn_bear: '🐻 クマ召喚',
+            spawn_wolves: '🐺 オオカミ召喚',
+            strip_weapon: '🗡️ 武器没収',
+            drop_random_item: '🎒 アイテムドロップ',
+            teleport_random: '🌀 ランダムテレポート',
+            blind_flash: '✨ 目くらまし',
+            freeze_player: '🧊 フリーズ',
+            // サポート系
+            follow_reward: '🎁 フォロー報酬（資材付与）',
+            heal_player: '💚 HP回復',
+            restore_food: '🍖 食料全回復',
+            restore_water: '🥤 水分全回復',
+            give_weapon: '🔫 武器支給',
+            give_medkit: '💉 医療キット支給',
+            give_building_materials: '🏗️ 建材支給',
+            speed_boost: '💨 速度アップ',
+            comfort_boost: '🛋️ 快適度アップ',
+            remove_bleeding: '🩹 出血解除'
+        };
+        let availableEventTypes = [];
+
+        function renderDebugButtons() {
+            const grid = document.getElementById('debugGrid');
+            grid.innerHTML = '';
+            Object.keys(EVENT_LABELS).forEach(eventType => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn-debug';
+                btn.textContent = EVENT_LABELS[eventType];
+                btn.onclick = () => sendTest(eventType);
+                grid.appendChild(btn);
+            });
+        }
+        renderDebugButtons();
+
+        function createMappingRow(giftName, eventType) {
+            const row = document.createElement('div');
+            row.className = 'mapping-row';
+
+            const giftInput = document.createElement('input');
+            giftInput.type = 'text';
+            giftInput.className = 'mapping-gift';
+            giftInput.placeholder = 'ギフト名（例: Rose）';
+            giftInput.value = giftName || '';
+
+            const select = document.createElement('select');
+            select.className = 'mapping-event';
+            availableEventTypes.forEach(et => {
+                const opt = document.createElement('option');
+                opt.value = et;
+                opt.textContent = EVENT_LABELS[et] || et;
+                if (et === eventType) opt.selected = true;
+                select.appendChild(opt);
+            });
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn-remove';
+            removeBtn.textContent = '✕';
+            removeBtn.onclick = () => row.remove();
+
+            row.appendChild(giftInput);
+            row.appendChild(select);
+            row.appendChild(removeBtn);
+            document.getElementById('mappingList').appendChild(row);
+        }
+
+        function addMappingRow() {
+            createMappingRow('', availableEventTypes[0] || '');
+        }
+
+        async function loadMappings() {
+            const res = await fetch('/api/gift-mappings');
+            const data = await res.json();
+            availableEventTypes = data.availableEventTypes || [];
+            document.getElementById('mappingList').innerHTML = '';
+            (data.giftMappings || []).forEach(m => createMappingRow(m.giftName, m.eventType));
+        }
+
+        async function saveMappings() {
+            const rows = document.querySelectorAll('#mappingList .mapping-row');
+            const giftMappings = Array.from(rows)
+                .map(row => ({
+                    giftName: row.querySelector('.mapping-gift').value.trim(),
+                    eventType: row.querySelector('.mapping-event').value
+                }))
+                .filter(m => m.giftName);
+
+            const alertBox = document.getElementById('mappingAlert');
+            alertBox.style.display = 'block';
+
+            try {
+                const res = await fetch('/api/gift-mappings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ giftMappings })
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || '保存に失敗しました');
+
+                alertBox.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+                alertBox.style.color = '#34d399';
+                alertBox.style.border = '1px solid #10b981';
+                alertBox.innerText = '✓ 保存しました。次のギフトから反映されます。';
+
+                // サーバー側で不正な行が除外されている場合があるため表示を最新化
+                document.getElementById('mappingList').innerHTML = '';
+                data.giftMappings.forEach(m => createMappingRow(m.giftName, m.eventType));
+            } catch (err) {
+                alertBox.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                alertBox.style.color = '#f87171';
+                alertBox.style.border = '1px solid #ef4444';
+                alertBox.innerText = '❌ エラー: ' + err.message;
+            }
+
+            setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
+        }
+
+        loadMappings();
 
         // テストイベント送信用スクリプト
         async function sendTest(eventType) {

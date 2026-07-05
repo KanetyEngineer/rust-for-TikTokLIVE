@@ -10,10 +10,7 @@ if not exist "node_modules\" (
     npm install
 )
 
-:: Web UIをデフォルトブラウザで開く
-start http://localhost:3000
-
-:: アプリケーションの起動
+:: アプリケーションの起動（Web UIはサーバーの起動が完了してから server.js 自身が開く）
 echo [INFO] アプリケーションを起動しています...
 node server.js
 
