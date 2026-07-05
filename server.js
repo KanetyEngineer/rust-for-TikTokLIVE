@@ -7,7 +7,6 @@ const app = express();
 const PORT = 3000;
 const CONFIG_PATH = path.join(__dirname, 'config.json');
 
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -44,7 +43,7 @@ app.post('/api/test-event', async (req, res) => {
     const config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
     
     if (!config.apiUrl || !config.apiToken || !config.steamId) {
-        return res.status(400).json({ success: false, error: '環境設定が完了していません。先に保存してください。' });
+        return res.status(400).json({ success: false, error: '環境設定が完了していません。config.json を編集してください。' });
     }
 
     console.log(`[DEBUG] テストイベント実行: ${eventType}`);
@@ -64,7 +63,7 @@ function startTikTokIntegration() {
     const config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
     
     if (!config.tiktokId) {
-        console.log('⚠️ TikTok IDが未設定です。Web UIから設定してください。');
+        console.log('⚠️ TikTok IDが未設定です。config.json を編集して設定してください。');
         return;
     }
 
@@ -100,15 +99,10 @@ function startTikTokIntegration() {
 }
 
 // -----------------------------------------
-// WEB UI用の設定読み書き
+// WEB UI用の設定読み取り（読み取り専用。設定変更は config.json を直接編集する）
 // -----------------------------------------
 app.get('/api/config', (req, res) => {
     res.json(JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8')));
-});
-app.post('/api/config', (req, res) => {
-    fs.writeFileSync(CONFIG_PATH, JSON.stringify(req.body, null, 2));
-    startTikTokIntegration(); // 保存時に再接続をトリガー
-    res.redirect('/?saved=true');
 });
 
 app.listen(PORT, () => {
