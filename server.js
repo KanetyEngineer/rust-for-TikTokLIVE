@@ -29,7 +29,7 @@ const AVAILABLE_EVENT_TYPES = [
     'give_weapon',
     'give_medkit',
     'give_building_materials',
-    'speed_boost',
+    'gather_boost',
     'comfort_boost',
     'remove_bleeding'
 ];

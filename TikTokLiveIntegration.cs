@@ -182,14 +182,20 @@ namespace Oxide.Plugins
                     targetPlayer.ChatMessage("<color=#ff3333>✨ 目がくらんだ！</color>");
                     break;
 
-                case "freeze_player": // 数秒間、移動を封じる
-                    targetPlayer.SetPlayerFlag(BasePlayer.PlayerFlags.Frozen, true);
+                case "freeze_player": // 数秒間、同じ位置にテレポートし続けて移動を封じる
+                    Vector3 freezePos = targetPlayer.transform.position;
                     targetPlayer.ChatMessage("<color=#3399ff>🧊 体が凍りついて動けない！</color>");
+                    timer.Repeat(0.2f, 25, () =>
+                    {
+                        if (targetPlayer != null && targetPlayer.IsConnected)
+                        {
+                            targetPlayer.Teleport(freezePos);
+                        }
+                    });
                     timer.Once(5f, () =>
                     {
                         if (targetPlayer != null && targetPlayer.IsConnected)
                         {
-                            targetPlayer.SetPlayerFlag(BasePlayer.PlayerFlags.Frozen, false);
                             targetPlayer.ChatMessage("<color=#3399ff>🧊 体の自由が戻った。</color>");
                         }
                     });
@@ -252,9 +258,18 @@ namespace Oxide.Plugins
                     targetPlayer.ChatMessage("<color=#33ff33>🏗️ 建材一式が支給された！</color>");
                     break;
 
-                case "speed_boost": // 一定時間、移動速度を上昇
-                    targetPlayer.modifiers.Add(PlayerModifiers.ModifierTypes.Speed, 0.5f, 15f);
-                    targetPlayer.ChatMessage("<color=#33ff33>💨 体が軽くなった！(15秒間、移動速度アップ)</color>");
+                case "gather_boost": // 採集効率が上がるチェーンソーと燃料を支給
+                    Item chainsaw = ItemManager.CreateByName("chainsaw", 1);
+                    if (chainsaw != null)
+                    {
+                        targetPlayer.inventory.GiveItem(chainsaw);
+                    }
+                    Item fuel = ItemManager.CreateByName("lowgradefuel", 50);
+                    if (fuel != null)
+                    {
+                        targetPlayer.inventory.GiveItem(fuel);
+                    }
+                    targetPlayer.ChatMessage("<color=#33ff33>🌾 採集が捗るチェーンソーが支給された！</color>");
                     break;
 
                 case "comfort_boost": // 快適度を上昇

@@ -110,7 +110,7 @@ tiktok.event <SteamID> teleport_random
 
 **妨害系**: `reduce_food`（食料減少） / `reduce_water`（水分減少） / `damage_player`（ダメージ） / `spawn_bear`（クマ召喚） / `spawn_wolves`（オオカミ召喚） / `strip_weapon`（武器没収） / `drop_random_item`（アイテムドロップ） / `teleport_random`（ランダムテレポート） / `blind_flash`（目くらまし） / `freeze_player`（フリーズ）
 
-**サポート系**: `follow_reward`（資材付与） / `heal_player`（HP回復） / `restore_food`（食料全回復） / `restore_water`（水分全回復） / `give_weapon`（武器支給） / `give_medkit`（医療キット支給） / `give_building_materials`（建材支給） / `speed_boost`（速度アップ） / `comfort_boost`（快適度アップ） / `remove_bleeding`（出血解除）
+**サポート系**: `follow_reward`（資材付与） / `heal_player`（HP回復） / `restore_food`（食料全回復） / `restore_water`（水分全回復） / `give_weapon`（武器支給） / `give_medkit`（医療キット支給） / `give_building_materials`（建材支給） / `gather_boost`（採集量アップ） / `comfort_boost`（快適度アップ） / `remove_bleeding`（出血解除）
 
 ### 本番の配信フロー
 
